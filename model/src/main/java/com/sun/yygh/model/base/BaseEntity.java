@@ -3,9 +3,10 @@ package com.sun.yygh.model.base;
 import com.baomidou.mybatisplus.annotation.IdType;
 import com.baomidou.mybatisplus.annotation.TableField;
 import com.baomidou.mybatisplus.annotation.TableId;
+import com.baomidou.mybatisplus.annotation.TableLogic;
 import com.fasterxml.jackson.annotation.JsonFormat;
 import io.swagger.annotations.ApiModelProperty;
-import jdk.jfr.DataAmount;
+
 import lombok.Data;
 
 import java.io.Serializable;
@@ -36,6 +37,7 @@ public class BaseEntity implements Serializable {
     private Date updateTime;
 
     @ApiModelProperty(value = "逻辑删除（1:已删除，0:未删除）")
+    @TableLogic
     @TableField("is_deleted")
     private Integer isDeleted;
 

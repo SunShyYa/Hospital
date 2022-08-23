@@ -19,6 +19,11 @@
     <dependencies>
         <dependency>
             <groupId>com.atguigu.yygh</groupId>
+            <artifactId>model</artifactId>
+            <version>1.0</version>
+        </dependency>
+        <dependency>
+            <groupId>com.atguigu.yygh</groupId>
             <artifactId>service-util</artifactId>
             <version>1.0</version>
         </dependency>
