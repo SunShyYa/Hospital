@@ -18,7 +18,6 @@ import java.util.List;
  **/
 @RestController
 @RequestMapping("/admin/cmn/dict")
-@CrossOrigin
 public class DictController {
 
     @Autowired
@@ -40,5 +39,24 @@ public class DictController {
     public Result importDict(MultipartFile file) {
         dictService.importDictData(file);
         return Result.ok();
+    }
+
+    @GetMapping("getName/{dictCode}/{value}")
+    public String getName(@PathVariable String dictCode,
+                          @PathVariable String value){
+        String name = dictService.getDictName(dictCode, value);
+        return name;
+    }
+
+    @GetMapping("getName/{value}")
+    public String getName(@PathVariable String value) {
+        String name = dictService.getDictName("", value);
+        return name;
+    }
+
+    @GetMapping("findByDictCode/{dictCode}")
+    public Result findByDictCode(@PathVariable String dictCode) {
+        List<Dict> list = dictService.findDictCode(dictCode);
+        return Result.ok(list);
     }
 }

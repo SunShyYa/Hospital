@@ -1,6 +1,7 @@
 package com.sun.yygh.cmn.service.impl;
 
 import com.alibaba.excel.EasyExcel;
+import com.alibaba.excel.util.StringUtils;
 import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
 import com.sun.yygh.cmn.listener.DictListener;
@@ -9,6 +10,7 @@ import com.sun.yygh.cmn.service.DictService;
 import com.sun.yygh.model.cmn.Dict;
 import com.sun.yygh.vo.cmn.DictEeVo;
 import org.springframework.beans.BeanUtils;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.cache.annotation.CacheEvict;
 import org.springframework.cache.annotation.Cacheable;
 import org.springframework.stereotype.Service;
@@ -30,6 +32,7 @@ import java.util.List;
  **/
 @Service
 public class DictServiceImpl extends ServiceImpl<DictMapper, Dict> implements DictService {
+
 
     @Override
     @Cacheable(value = "dict",keyGenerator="keyGenerator")
@@ -69,6 +72,35 @@ public class DictServiceImpl extends ServiceImpl<DictMapper, Dict> implements Di
                     .sheet("数据字典").doWrite(list);
         } catch (IOException e) {
             e.printStackTrace();
+        }
+    }
+
+    @Override
+    public List<Dict> findDictCode(String dictCode) {
+        QueryWrapper<Dict> wrapper = new QueryWrapper<>();
+        wrapper.eq("dict_code", dictCode);
+        Dict dict = baseMapper.selectOne(wrapper);
+        List<Dict> childData = this.findChildData(dict.getId());
+        return childData;
+
+    }
+
+    @Override
+    public String getDictName(String dictCode, String value) {
+        if (StringUtils.isEmpty(dictCode)) {
+            QueryWrapper<Dict> wrapper = new QueryWrapper<>();
+            wrapper.eq("value", value);
+            Dict dict = baseMapper.selectOne(wrapper);
+            return dict.getName();
+        } else {
+            QueryWrapper<Dict> wrapper = new QueryWrapper<>();
+            wrapper.eq("dict_code", dictCode);
+            Dict dict = baseMapper.selectOne(wrapper);
+            Long id = dict.getId();
+            Dict dict1 = baseMapper.selectOne(new QueryWrapper<Dict>()
+                    .eq("parent_id", id)
+                    .eq("value", value));
+            return dict1.getName();
         }
     }
 

@@ -11,6 +11,8 @@
         <module>hospital-manage</module>
         <module>model</module>
         <module>service</module>
+        <module>service _client</module>
+        <module>service_gateway</module>
     </modules>
 
     <parent>
