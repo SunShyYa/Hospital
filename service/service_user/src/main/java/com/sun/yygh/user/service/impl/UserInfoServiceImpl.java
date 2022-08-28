@@ -7,6 +7,7 @@ import com.sun.yygh.common.exception.YyghException;
 import com.sun.yygh.common.help.JwtHelper;
 import com.sun.yygh.common.result.ResultCodeEnum;
 import com.sun.yygh.model.user.UserInfo;
+import com.sun.yygh.model.user.UserLoginRecord;
 import com.sun.yygh.user.mapper.UserInfoMapper;
 import com.sun.yygh.user.service.UserInfoService;
 import com.sun.yygh.vo.user.LoginVo;
@@ -30,6 +31,14 @@ public class UserInfoServiceImpl extends ServiceImpl<UserInfoMapper, UserInfo> i
     private RedisTemplate<String, String> redisTemplate;
 
     @Override
+    public UserInfo getByOpenid(String openId) {
+        QueryWrapper<UserInfo> wrapper = new QueryWrapper<>();
+        wrapper.eq("openid",openId);
+        UserInfo userInfo = baseMapper.selectOne(wrapper);
+        return userInfo;
+    }
+
+    @Override
     public Map<String, Object> loginUser(LoginVo loginVo) {
         String phone = loginVo.getPhone();
         String code = loginVo.getCode();
@@ -42,19 +51,39 @@ public class UserInfoServiceImpl extends ServiceImpl<UserInfoMapper, UserInfo> i
             throw new YyghException(ResultCodeEnum.CODE_ERROR);
         }
 
-        QueryWrapper<UserInfo> queryWrapper = new QueryWrapper<>();
-        queryWrapper.eq("phone", phone);
-        UserInfo userInfo = baseMapper.selectOne(queryWrapper);
-        if (userInfo == null) {
-            userInfo = new UserInfo();
-            userInfo.setName("");
-            userInfo.setPhone(phone);
-            userInfo.setStatus(1);
-            baseMapper.insert(userInfo);
+        //绑定手机号码
+        UserInfo userInfo = null;
+        if(!StringUtils.isEmpty(loginVo.getOpenid())) {
+            userInfo = this.getByOpenid(loginVo.getOpenid());
+            if(null != userInfo) {
+                userInfo.setPhone(loginVo.getPhone());
+                this.updateById(userInfo);
+            } else {
+                throw new YyghException(ResultCodeEnum.DATA_ERROR);
+            }
         }
+
+        //userInfo=null 说明手机直接登录
+        if(null == userInfo) {
+            QueryWrapper<UserInfo> queryWrapper = new QueryWrapper<>();
+            queryWrapper.eq("phone", phone);
+            userInfo = baseMapper.selectOne(queryWrapper);
+            if(null == userInfo) {
+                userInfo = new UserInfo();
+                userInfo.setName("");
+                userInfo.setPhone(phone);
+                userInfo.setStatus(1);
+                this.save(userInfo);
+            }
+        }
+
+
         if (userInfo.getStatus() == 0) {
             throw new YyghException(ResultCodeEnum.LOGIN_DISABLED_ERROR);
         }
+
+
+
         Map<String, Object> map = new HashMap<>();
         String name = userInfo.getName();
         if (StringUtils.isEmpty(name)) {
