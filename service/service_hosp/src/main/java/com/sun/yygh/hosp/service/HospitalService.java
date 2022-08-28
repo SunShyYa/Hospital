@@ -4,6 +4,7 @@ import com.sun.yygh.model.hosp.Hospital;
 import com.sun.yygh.vo.hosp.HospitalQueryVo;
 import org.springframework.data.domain.Page;
 
+import java.util.List;
 import java.util.Map;
 
 /**
@@ -24,4 +25,8 @@ public interface HospitalService {
     Map<String, Object> getHospById(String id);
 
     String getHosName(String hoscode);
+
+    List<Hospital> findByHosname(String hosname);
+
+    Map<String, Object> item(String hoscode);
 }
