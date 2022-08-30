@@ -3,8 +3,12 @@ package com.sun.yygh.hosp.controller.api;
 import com.sun.yygh.common.result.Result;
 import com.sun.yygh.hosp.service.DepartmentService;
 import com.sun.yygh.hosp.service.HospitalService;
+import com.sun.yygh.hosp.service.HospitalSetService;
+import com.sun.yygh.hosp.service.ScheduleService;
 import com.sun.yygh.model.hosp.Hospital;
 import com.sun.yygh.vo.hosp.HospitalQueryVo;
+import com.sun.yygh.vo.hosp.ScheduleOrderVo;
+import com.sun.yygh.vo.order.SignInfoVo;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -28,6 +32,10 @@ public class HospitalApiController {
     private HospitalService hospitalService;
     @Autowired
     private DepartmentService departmentService;
+    @Autowired
+    private ScheduleService scheduleService;
+    @Autowired
+    private HospitalSetService hospitalSetService;
 
     @GetMapping("findHospList/{page}/{limit}")
     public Result findHospList(@PathVariable Integer page,
@@ -52,5 +60,35 @@ public class HospitalApiController {
     public Result item(@PathVariable String hoscode) {
         return Result.ok(hospitalService.item(hoscode));
 
+    }
+
+    @GetMapping("auth/getBookingScheduleRule/{page}/{limit}/{hoscode}/{depcode}")
+    public Result getBookingSchedule(@PathVariable Integer page,
+                                     @PathVariable Integer limit,
+                                     @PathVariable String hoscode,
+                                     @PathVariable String depcode) {
+        return Result.ok(scheduleService.getBookingScheduleRule(page, limit, hoscode, depcode));
+    }
+
+    @GetMapping("auth/findScheduleList/{hoscode}/{depcode}/{workDate}")
+    public Result findScheduleList(@PathVariable String hoscode,
+                                   @PathVariable String depcode,
+                                   @PathVariable String workDate) {
+        return Result.ok(scheduleService.getDetail(hoscode, depcode, workDate));
+    }
+
+    @GetMapping("getSchedule/{scheduleId}")
+    public Result getSchedule(@PathVariable String scheduleId) {
+        return Result.ok(scheduleService.getById(scheduleId));
+    }
+
+    @GetMapping("inner/getScheduleOrderVo/{scheduleId}")
+    public ScheduleOrderVo getScheduleOrderVo(@PathVariable String scheduleId) {
+        return scheduleService.getScheduleOrderVo(scheduleId);
+    }
+
+    @GetMapping("inner/getSignInfoVo/{hoscode}")
+    public SignInfoVo getSignInfoVo(@PathVariable String hoscode) {
+        return hospitalSetService.getSignInfoVo(hoscode);
     }
 }

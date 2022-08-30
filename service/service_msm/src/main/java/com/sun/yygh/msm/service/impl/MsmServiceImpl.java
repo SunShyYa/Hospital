@@ -11,6 +11,7 @@ import com.aliyuncs.http.MethodType;
 import com.aliyuncs.profile.DefaultProfile;
 import com.sun.yygh.msm.service.MsmService;
 import com.sun.yygh.msm.util.ConstantPropertiesUtils;
+import com.sun.yygh.vo.msm.MsmVo;
 import org.springframework.stereotype.Service;
 
 import java.util.HashMap;
@@ -24,6 +25,15 @@ import java.util.Map;
  **/
 @Service
 public class MsmServiceImpl implements MsmService {
+    @Override
+    public boolean send(MsmVo msmVo) {
+        if (!StringUtils.isEmpty(msmVo.getPhone())) {
+            String code = (String) msmVo.getParam().get("code");
+            return this.send(msmVo.getPhone(), code);
+        }
+        return false;
+    }
+
     @Override
     public boolean send(String phone, String code) {
         if (StringUtils.isEmpty(phone)){

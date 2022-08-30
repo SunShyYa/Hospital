@@ -4,6 +4,9 @@
     <modelVersion>4.0.0</modelVersion>
     <modules>
         <module>service_cmn_client</module>
+        <module>service_user_client</module>
+        <module>service_order_client</module>
+        <module>service_hosp_client</module>
     </modules>
 
     <parent>
